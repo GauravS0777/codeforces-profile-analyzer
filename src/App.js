@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import apiClient from "./apis/apiClient";
+import BarChartContainer from "./components/BarChartContainer";
+import { getProblemRatingDistribution } from "./utils";
 
-function App() {
+const App = () => {
+  const [username, setUsername] = useState("");
+  const [data, setData] = useState();
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const fetchUserInfo = async () => {
+    setErrorMsg("");
+    setData(null);
+    setLoading(true);
+    try {
+      const response = await apiClient.get(`/user.status?handle=${username}`);
+      console.log(response.data.result);
+      setData(response.data.result);
+    } catch (error) {
+      setErrorMsg("Invalid Codeforces Handle");
+    }
+    setLoading(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <input type="text" onChange={(e) => setUsername(e.target.value)} />
+      <button onClick={fetchUserInfo}>Submit</button>
+      {errorMsg !== "" ? (
+        <p>{errorMsg}</p>
+      ) : loading ? (
+        <p>Loading...</p>
+      ) : (
+        <BarChartContainer getData={getProblemRatingDistribution} data={data} />
+      )}
+    </>
   );
-}
+};
 
 export default App;
