@@ -1,7 +1,13 @@
 import { useState } from "react";
 import apiClient from "./apis/apiClient";
-import BarChartContainer from "./components/BarChartContainer";
-import { getProblemRatingDistribution } from "./utils";
+import BarChart from "./components/BarChart";
+import CalendarHeatMap from "./components/CalendarHeatMap";
+import PieChart from "./components/PieChart";
+import {
+  getProblemRatingDistribution,
+  getProblemTagDistribution,
+  getDataForCalendarHeatmap,
+} from "./utils";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -15,7 +21,6 @@ const App = () => {
     setLoading(true);
     try {
       const response = await apiClient.get(`/user.status?handle=${username}`);
-      console.log(response.data.result);
       setData(response.data.result);
     } catch (error) {
       setErrorMsg("Invalid Codeforces Handle");
@@ -32,7 +37,21 @@ const App = () => {
       ) : loading ? (
         <p>Loading...</p>
       ) : (
-        <BarChartContainer getData={getProblemRatingDistribution} data={data} />
+        <div style={{ marginTop: 20 }}>
+          <BarChart
+            getData={getProblemRatingDistribution}
+            data={data}
+            axisTitle={["Problem Rating", "Solved Count"]}
+          />
+
+          <PieChart
+            getData={getProblemTagDistribution}
+            data={data}
+            axisTitle={["Problem Tag", "Solved Count"]}
+          />
+
+          <CalendarHeatMap getData={getDataForCalendarHeatmap} data={data} />
+        </div>
       )}
     </>
   );
