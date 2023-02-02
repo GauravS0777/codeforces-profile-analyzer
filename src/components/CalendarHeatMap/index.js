@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import moment from "moment";
 import "./index.css";
+import ReactTooltip from "react-tooltip";
 
 const CalendarHeatMap = ({ data: parentData, getData }) => {
   const [data, setData] = useState();
@@ -29,7 +30,17 @@ const CalendarHeatMap = ({ data: parentData, getData }) => {
           return `color-${value.count}`;
         }}
         showWeekdayLabels={true}
+        tooltipDataAttrs={(value) => {
+          if (value.date) {
+            return {
+              "data-tip": `${
+                value.numberOfSubmissions || 0
+              } submissions on ${moment(value.date).format("DD/MM/YYYY")}`,
+            };
+          }
+        }}
       />
+      <ReactTooltip />
     </>
   ) : (
     <></>
