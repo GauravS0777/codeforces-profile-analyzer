@@ -3,10 +3,12 @@ import apiClient from "./apis/apiClient";
 import BarChart from "./components/BarChart";
 import CalendarHeatMap from "./components/CalendarHeatMap";
 import PieChart from "./components/PieChart";
+import LineChart from "./components/LineChart";
 import {
   getProblemRatingDistribution,
   getProblemTagDistribution,
   getDataForCalendarHeatmap,
+  getContestRatingChanges,
 } from "./utils";
 
 const App = () => {
@@ -14,14 +16,18 @@ const App = () => {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [contestData, setContestData] = useState();
 
   const fetchUserInfo = async () => {
     setErrorMsg("");
     setData(null);
     setLoading(true);
     try {
-      const response = await apiClient.get(`/user.status?handle=${username}`);
+      let response = await apiClient.get(`/user.status?handle=${username}`);
       setData(response.data.result);
+
+      response = await apiClient.get(`/user.rating?handle=${username}`);
+      setContestData(response.data.result);
     } catch (error) {
       setErrorMsg("Invalid Codeforces Handle");
     }
@@ -48,6 +54,12 @@ const App = () => {
             getData={getProblemTagDistribution}
             data={data}
             axisTitle={["Problem Tag", "Solved Count"]}
+          />
+
+          <LineChart
+            data={contestData}
+            getData={getContestRatingChanges}
+            axisTitle={["Time", "Rating"]}
           />
 
           <CalendarHeatMap getData={getDataForCalendarHeatmap} data={data} />

@@ -87,3 +87,12 @@ export const getDataForCalendarHeatmap = (data) => {
 
   return arr;
 };
+
+export const getContestRatingChanges = (data) => {
+  const arr = [];
+  data.forEach((value) => {
+    arr.push([value.ratingUpdateTimeSeconds, value.newRating]);
+  });
+
+  return arr;
+};
