@@ -11,6 +11,8 @@ import {
   getContestRatingChanges,
 } from "./utils";
 
+import "./App.css";
+
 const App = () => {
   const [username, setUsername] = useState("");
   const [data, setData] = useState();
@@ -36,35 +38,66 @@ const App = () => {
 
   return (
     <>
-      <input type="text" onChange={(e) => setUsername(e.target.value)} />
-      <button onClick={fetchUserInfo}>Submit</button>
-      {errorMsg !== "" ? (
-        <p>{errorMsg}</p>
-      ) : loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div style={{ marginTop: 20 }}>
-          <BarChart
-            getData={getProblemRatingDistribution}
-            data={data}
-            axisTitle={["Problem Rating", "Solved Count"]}
-          />
+      <div className="main-container">
+        <h2 className="app-heading">Codeforces Profile Analyzer</h2>
+        <input
+          className="handle-input"
+          type="text"
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter codeforces handle"
+        />
+        <button className="submit-button" onClick={fetchUserInfo}>
+          Submit
+        </button>
+        {errorMsg !== "" ? (
+          <p className="error-message">{errorMsg}</p>
+        ) : loading ? (
+          <p>Loading...</p>
+        ) : (
+          data && (
+            <div style={{ marginTop: 20 }}>
+              <div>
+                <h3>Solved Problem's Rating Distribution</h3>
 
-          <PieChart
-            getData={getProblemTagDistribution}
-            data={data}
-            axisTitle={["Problem Tag", "Solved Count"]}
-          />
+                <BarChart
+                  getData={getProblemRatingDistribution}
+                  data={data}
+                  axisTitle={["Problem Rating", "Solved Count"]}
+                />
+              </div>
 
-          <LineChart
-            data={contestData}
-            getData={getContestRatingChanges}
-            axisTitle={["Time", "Rating"]}
-          />
+              <div>
+                <h3>Solved Problem's Tags Distribution</h3>
 
-          <CalendarHeatMap getData={getDataForCalendarHeatmap} data={data} />
-        </div>
-      )}
+                <PieChart
+                  getData={getProblemTagDistribution}
+                  data={data}
+                  axisTitle={["Problem Tag", "Solved Count"]}
+                />
+              </div>
+
+              <div>
+                <h3>User contest rating change</h3>
+
+                <LineChart
+                  data={contestData}
+                  getData={getContestRatingChanges}
+                  axisTitle={["Time", "Rating"]}
+                />
+              </div>
+
+              <div>
+                <h3>Calendar Heat Map</h3>
+
+                <CalendarHeatMap
+                  getData={getDataForCalendarHeatmap}
+                  data={data}
+                />
+              </div>
+            </div>
+          )
+        )}
+      </div>
     </>
   );
 };

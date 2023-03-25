@@ -1,0 +1,23 @@
+.main-container {
+  padding: 10px;
+}
+
+.app-heading {
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.handle-input {
+  min-width: 200px;
+  padding: 5px;
+}
+
+.submit-button {
+  margin-left: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.error-message {
+  color: red;
+}

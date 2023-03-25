@@ -27,7 +27,6 @@ const LineChart = ({ data: parentData, getData, axisTitle }) => {
   }, [parentData, getData, axisTitle]);
 
   const options = {
-    title: "User's Rating Change",
     curveType: "function",
     legend: { position: "bottom" },
     hAxis: { ticks: hAxisTicks },
@@ -38,7 +37,7 @@ const LineChart = ({ data: parentData, getData, axisTitle }) => {
     <Chart
       chartType="LineChart"
       width="100%"
-      height="400px"
+      height="350px"
       data={data}
       options={options}
     />
