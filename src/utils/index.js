@@ -91,7 +91,15 @@ export const getDataForCalendarHeatmap = (data) => {
 export const getContestRatingChanges = (data) => {
   const arr = [];
   data.forEach((value) => {
-    arr.push([value.ratingUpdateTimeSeconds, value.newRating]);
+    arr.push([
+      {
+        v: value.ratingUpdateTimeSeconds,
+        f: `Date: ${moment
+          .unix(value.ratingUpdateTimeSeconds)
+          .format("DD/MM/YYYY")}`,
+      },
+      value.newRating,
+    ]);
   });
 
   return arr;

@@ -87,7 +87,7 @@ const App = () => {
               </div>
 
               <div>
-                <h3>Calendar Heat Map</h3>
+                <h3>User Activity Heat Map</h3>
 
                 <CalendarHeatMap
                   getData={getDataForCalendarHeatmap}
