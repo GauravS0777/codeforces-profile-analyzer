@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import apiClient from "./apis/apiClient";
 import BarChart from "./components/BarChart";
 import CalendarHeatMap from "./components/CalendarHeatMap";
@@ -9,6 +9,8 @@ import {
   getProblemTagDistribution,
   getDataForCalendarHeatmap,
   getContestRatingChanges,
+  getProblemsCount,
+  getUnsolvedProblems,
 } from "./utils";
 
 import "./App.css";
@@ -19,6 +21,8 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [contestData, setContestData] = useState();
+  const [problemsCount, setProblemsCount] = useState(0);
+  const [unsolvedProblemsList, setUnsolvedProblemsList] = useState([]);
 
   const fetchUserInfo = async () => {
     setErrorMsg("");
@@ -36,6 +40,13 @@ const App = () => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    if (data) {
+      setProblemsCount(getProblemsCount(data));
+      setUnsolvedProblemsList(getUnsolvedProblems(data));
+    }
+  }, [data]);
+
   return (
     <>
       <div className="main-container">
@@ -47,7 +58,7 @@ const App = () => {
           placeholder="Enter codeforces handle"
         />
         <button className="submit-button" onClick={fetchUserInfo}>
-          Submit
+          Search
         </button>
         {errorMsg !== "" ? (
           <p className="error-message">{errorMsg}</p>
@@ -56,7 +67,7 @@ const App = () => {
         ) : (
           data && (
             <div style={{ marginTop: 20 }}>
-              <div>
+              <div className="section-container">
                 <h3>Solved Problem's Rating Distribution</h3>
 
                 <BarChart
@@ -66,7 +77,7 @@ const App = () => {
                 />
               </div>
 
-              <div>
+              <div className="section-container">
                 <h3>Solved Problem's Tags Distribution</h3>
 
                 <PieChart
@@ -76,7 +87,7 @@ const App = () => {
                 />
               </div>
 
-              <div>
+              <div className="section-container">
                 <h3>User contest rating change</h3>
 
                 <LineChart
@@ -86,7 +97,32 @@ const App = () => {
                 />
               </div>
 
-              <div>
+              <div className="section-container">
+                <h3>Stats</h3>
+
+                <p>Number of contests: {contestData.length}</p>
+                <p>Number of problems tried: {problemsCount.tried}</p>
+                <p>Number of problems solved: {problemsCount.solved}</p>
+                <p>Number of problems unsolved: {problemsCount.unsolved}</p>
+              </div>
+
+              {unsolvedProblemsList.length && (
+                <div className="section-container">
+                  <h3>Unsolved Problems</h3>
+
+                  <div className="unsolved-problems-container">
+                    {unsolvedProblemsList.map((value) => (
+                      <p>
+                        <a href={value.link} target="_blank">
+                          {value.name}
+                        </a>
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="section-container">
                 <h3>User Activity Heat Map</h3>
 
                 <CalendarHeatMap

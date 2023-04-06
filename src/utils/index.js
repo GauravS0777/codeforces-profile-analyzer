@@ -1,5 +1,67 @@
 import moment from "moment/moment";
 
+export const getProblemsCount = (data) => {
+  const solved = new Set();
+  const tried = new Set();
+  data?.forEach((value) => {
+    const name = value?.problem?.name;
+    const verdict = value?.verdict;
+
+    if (!solved.has(name) && verdict === "OK") {
+      solved.add(name);
+    }
+
+    if (!tried.has(name)) {
+      tried.add(name);
+    }
+  });
+
+  return {
+    tried: tried.size,
+    solved: solved.size,
+    unsolved: tried.size - solved.size,
+  };
+};
+
+export const getUnsolvedProblems = (data) => {
+  const solved = new Set();
+  const tried = new Set();
+  const triedMap = {};
+
+  data?.forEach((value) => {
+    const name = value?.problem?.name;
+    const verdict = value?.verdict;
+
+    if (!solved.has(name) && verdict === "OK") {
+      solved.add(name);
+    }
+
+    if (!tried.has(name)) {
+      tried.add(name);
+      triedMap[name] = value;
+    }
+  });
+
+  const arr = [];
+
+  tried.forEach((name) => {
+    if (!solved.has(name)) {
+      const value = triedMap[name];
+
+      const contestId = value?.problem?.contestId;
+      const problemIndex = value?.problem?.index;
+
+      console.log(value);
+      arr.push({
+        name: `${contestId}-${problemIndex}`,
+        link: `https://codeforces.com/contest/${contestId}/problem/${problemIndex}`,
+      });
+    }
+  });
+
+  return arr;
+};
+
 export const getProblemRatingDistribution = (data) => {
   const mp = {};
   const set = new Set();
