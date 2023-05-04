@@ -13,19 +13,20 @@ import {
   getUnsolvedProblems,
 } from "./utils";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "./App.css";
 
 const App = () => {
   const [username, setUsername] = useState("");
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
   const [contestData, setContestData] = useState();
   const [problemsCount, setProblemsCount] = useState(0);
   const [unsolvedProblemsList, setUnsolvedProblemsList] = useState([]);
 
   const fetchUserInfo = async () => {
-    setErrorMsg("");
     setData(null);
     setLoading(true);
     try {
@@ -35,7 +36,12 @@ const App = () => {
       response = await apiClient.get(`/user.rating?handle=${username}`);
       setContestData(response.data.result);
     } catch (error) {
-      setErrorMsg("Invalid Codeforces Handle");
+      console.log("Error: ", error);
+      if (error?.response?.status === 400) {
+        toast("Invalid Codeforces Handle");
+      } else {
+        toast("Something went wrong");
+      }
     }
     setLoading(false);
   };
@@ -60,9 +66,7 @@ const App = () => {
         <button className="submit-button" onClick={fetchUserInfo}>
           Search
         </button>
-        {errorMsg !== "" ? (
-          <p className="error-message">{errorMsg}</p>
-        ) : loading ? (
+        {loading ? (
           <p>Loading...</p>
         ) : (
           data && (
@@ -134,6 +138,8 @@ const App = () => {
           )
         )}
       </div>
+
+      <ToastContainer />
     </>
   );
 };
