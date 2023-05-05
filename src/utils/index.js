@@ -166,3 +166,31 @@ export const getContestRatingChanges = (data) => {
 
   return arr;
 };
+
+export const getYearsOptions = (data) => {
+  const currentYear = moment().year();
+
+  if (data && data.length) {
+    const n = data.length;
+
+    const firstYear = moment.unix(data[n - 1].creationTimeSeconds).year();
+
+    console.log("firstYear: ", firstYear);
+
+    const options = [{ label: "Choose year" }];
+
+    for (let year = currentYear; year >= firstYear; year--) {
+      options.push({
+        label: `${year}`,
+        value: `${year}`,
+      });
+    }
+
+    return options;
+  }
+
+  return [
+    { label: "Choose year" },
+    { label: `${currentYear}`, value: `${currentYear}` },
+  ];
+};

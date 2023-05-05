@@ -4,15 +4,31 @@ import moment from "moment";
 import "./index.css";
 import ReactTooltip from "react-tooltip";
 
-const CalendarHeatMap = ({ data: parentData, getData }) => {
+const CalendarHeatMap = ({ data: parentData, getData, year }) => {
   const [data, setData] = useState();
-  const [startDate, setStartDate] = useState(new Date("2022-01-01"));
+  const [startDate, setStartDate] = useState(
+    moment(new Date()).subtract(1, "years").toDate()
+  );
   const [endDate, setEndDate] = useState(new Date());
 
   useEffect(() => {
-    if (parentData) {
-      setEndDate(new Date());
+    if (year) {
+      const start_date = moment(`01-01-${year}`).toDate();
+      const end_date = moment(`12-31-${year}`).toDate();
+
+      console.log("Start date: ", start_date);
+      console.log("End date: ", end_date);
+
+      setStartDate(start_date);
+      setEndDate(end_date);
+    } else {
       setStartDate(moment(new Date()).subtract(1, "years").toDate());
+      setEndDate(new Date());
+    }
+  }, [year]);
+
+  useEffect(() => {
+    if (parentData) {
       setData(getData(parentData));
     }
   }, [parentData, getData]);

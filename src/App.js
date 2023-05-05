@@ -11,12 +11,20 @@ import {
   getContestRatingChanges,
   getProblemsCount,
   getUnsolvedProblems,
+  getYearsOptions,
 } from "./utils";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import "./App.css";
+
+import ReactLoading from "react-loading";
+import { Container } from "@mui/material";
+
+import { ContestLister } from "./components/ContestsLister";
+
+import Select from "react-select";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -25,6 +33,8 @@ const App = () => {
   const [contestData, setContestData] = useState();
   const [problemsCount, setProblemsCount] = useState(0);
   const [unsolvedProblemsList, setUnsolvedProblemsList] = useState([]);
+  const [yearOptions, setYearOptions] = useState([]);
+  const [year, setYear] = useState({ label: "Choose Year" });
 
   const fetchUserInfo = async () => {
     setData(null);
@@ -50,6 +60,7 @@ const App = () => {
     if (data) {
       setProblemsCount(getProblemsCount(data));
       setUnsolvedProblemsList(getUnsolvedProblems(data));
+      setYearOptions(getYearsOptions(data));
     }
   }, [data]);
 
@@ -67,7 +78,15 @@ const App = () => {
           Search
         </button>
         {loading ? (
-          <p>Loading...</p>
+          <Container
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              paddingTop: "200px",
+            }}
+          >
+            <ReactLoading type="spin" color="#000000" height={60} width={60} />
+          </Container>
         ) : (
           data && (
             <div style={{ marginTop: 20 }}>
@@ -127,12 +146,41 @@ const App = () => {
               )}
 
               <div className="section-container">
-                <h3>User Activity Heat Map</h3>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <h3>User Activity Heat Map</h3>
+
+                  <div
+                    style={{
+                      width: 180,
+                    }}
+                  >
+                    <Select
+                      options={yearOptions}
+                      onChange={(option) => {
+                        setYear(option);
+                      }}
+                      value={year}
+                    />
+                  </div>
+                </div>
 
                 <CalendarHeatMap
                   getData={getDataForCalendarHeatmap}
                   data={data}
+                  year={year.value}
                 />
+              </div>
+
+              <div className="section-container">
+                <h3>Current or Upcoming Contests</h3>
+
+                <ContestLister />
               </div>
             </div>
           )

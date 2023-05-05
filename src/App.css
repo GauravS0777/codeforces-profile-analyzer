@@ -16,6 +16,11 @@
   margin-left: 10px;
   padding: 5px;
   cursor: pointer;
+  border-radius: 5px;
+  background-color: #1769aa;
+  color: #ffffff;
+  border: 0;
+  font-size: 16px;
 }
 
 .error-message {
@@ -36,6 +41,7 @@
   display: flex;
   gap: 12px;
   padding: 5px 10px;
+  flex-wrap: wrap;
 }
 
 .unsolved-problems-container a {
