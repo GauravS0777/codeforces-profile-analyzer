@@ -194,3 +194,18 @@ export const getYearsOptions = (data) => {
     { label: `${currentYear}`, value: `${currentYear}` },
   ];
 };
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+export const getRandomProblem = (problemList) => {
+  if (!problemList || !problemList.length) {
+    return undefined;
+  }
+
+  const n = problemList.length;
+  const index = getRandomInt(n);
+
+  return problemList[index];
+};

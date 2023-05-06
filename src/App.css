@@ -9,12 +9,13 @@
 
 .handle-input {
   min-width: 200px;
-  padding: 5px;
+  padding: 8px;
+  outline: none;
 }
 
 .submit-button {
   margin-left: 10px;
-  padding: 5px;
+  padding: 8px;
   cursor: pointer;
   border-radius: 5px;
   background-color: #1769aa;
@@ -44,7 +45,25 @@
   flex-wrap: wrap;
 }
 
-.unsolved-problems-container a {
+a {
   text-decoration: none;
   color: blue;
+}
+
+.problemCardWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.problemCard {
+  padding: 20px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  gap: 20px;
+}
+
+.problemCard:hover {
+  background-color: lightgray;
 }

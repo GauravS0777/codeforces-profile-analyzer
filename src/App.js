@@ -12,6 +12,7 @@ import {
   getProblemsCount,
   getUnsolvedProblems,
   getYearsOptions,
+  getRandomProblem,
 } from "./utils";
 
 import { ToastContainer, toast } from "react-toastify";
@@ -26,6 +27,16 @@ import { ContestLister } from "./components/ContestsLister";
 
 import Select from "react-select";
 
+import axios from "axios";
+
+const makeTwoDigit = (d) => {
+  if (d < 10) {
+    return `0${d}`;
+  }
+
+  return d;
+};
+
 const App = () => {
   const [username, setUsername] = useState("");
   const [data, setData] = useState();
@@ -35,16 +46,19 @@ const App = () => {
   const [unsolvedProblemsList, setUnsolvedProblemsList] = useState([]);
   const [yearOptions, setYearOptions] = useState([]);
   const [year, setYear] = useState({ label: "Choose Year" });
+  const [problemList, setProblemList] = useState([]);
+  const [problem, setProblem] = useState();
+  const [contestsList, setContestsList] = useState([]);
 
   const fetchUserInfo = async () => {
     setData(null);
     setLoading(true);
     try {
       let response = await apiClient.get(`/user.status?handle=${username}`);
-      setData(response.data.result);
+      setData(response?.data?.result);
 
       response = await apiClient.get(`/user.rating?handle=${username}`);
-      setContestData(response.data.result);
+      setContestData(response?.data?.result);
     } catch (error) {
       console.log("Error: ", error);
       if (error?.response?.status === 400) {
@@ -63,6 +77,110 @@ const App = () => {
       setYearOptions(getYearsOptions(data));
     }
   }, [data]);
+
+  const getProblemList = async () => {
+    try {
+      const response = await apiClient.get("/problemset.problems");
+      setProblemList(response?.data?.result?.problems);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getProblemList();
+  }, []);
+
+  useEffect(() => {
+    console.log("Problem list: ", problemList);
+    const randomProblem = getRandomProblem(problemList);
+    setProblem(randomProblem);
+    console.log("Random problem: ", randomProblem);
+  }, [problemList]);
+
+  const fetchContestsList = async () => {
+    const site = "codeforces";
+    const res = await axios.get(`https://kontests.net/api/v1/${site}`);
+    let data = res.data;
+    data.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    data = data.map((value) => {
+      let d = parseInt(value.duration) / 3600;
+      if (d >= 24) {
+        d = parseInt(d / 24);
+        d = `${d} days`;
+      } else {
+        if (d % 0.5 !== 0) {
+          d = d.toFixed(2);
+        }
+        d = `${d} hours`;
+      }
+
+      let s = value.site;
+      if (!value.site) {
+        s = site
+          .split("_")
+          .map((txt) => txt.charAt(0).toUpperCase() + txt.slice(1))
+          .join("");
+      }
+
+      let t = new Date(value.start_time);
+      const start_date = `${makeTwoDigit(t.getDate())}-${makeTwoDigit(
+        t.getMonth() + 1
+      )}-${t.getFullYear()}`;
+      const start_time = `${makeTwoDigit(t.getHours())}:${makeTwoDigit(
+        t.getMinutes()
+      )}`;
+
+      t = new Date(value.end_time);
+      const end_date = `${makeTwoDigit(t.getDate())}-${makeTwoDigit(
+        t.getMonth() + 1
+      )}-${t.getFullYear()}`;
+      const end_time = `${makeTwoDigit(t.getHours())}:${makeTwoDigit(
+        t.getMinutes()
+      )}`;
+
+      value = {
+        ...value,
+        duration: d,
+        site: s,
+        start_date: start_date,
+        start_time: start_time,
+        end_date: end_date,
+        end_time: end_time,
+      };
+      return value;
+    });
+    setContestsList(data);
+  };
+
+  useEffect(() => {
+    fetchContestsList();
+  }, []);
+
+  const displayProblem = (problem) => {
+    if (!problem) {
+      return <></>;
+    }
+
+    const link = `https://codeforces.com/problemset/problem/${problem?.contestId}/${problem?.index}`;
+
+    return (
+      <div className="problemCardWrapper">
+        <div
+          className="problemCard"
+          onClick={() => {
+            window.location = link;
+          }}
+        >
+          <span>
+            {problem?.contestId}-{problem?.index}
+          </span>
+          <span>{problem.name}</span>
+          <span>{problem.rating}</span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -178,9 +296,32 @@ const App = () => {
               </div>
 
               <div className="section-container">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <h3>Random problem</h3>
+
+                  <button
+                    className="submit-button"
+                    onClick={() => {
+                      setProblem(getRandomProblem(problemList));
+                    }}
+                  >
+                    Search Problem
+                  </button>
+                </div>
+
+                {displayProblem(problem)}
+              </div>
+
+              <div className="section-container">
                 <h3>Current or Upcoming Contests</h3>
 
-                <ContestLister />
+                <ContestLister contestsList={contestsList} />
               </div>
             </div>
           )
